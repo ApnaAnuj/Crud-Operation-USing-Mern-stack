@@ -1,35 +1,43 @@
-const express  = require('express')
-const cors = require('cors')
-const mongoose = require('mongoose')
+// Importing necessary packages
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
 
-const app = express()
-app.use(cors())
-app.use(express.json())
+const app = express(); // Creating an Express app
 
-const PORT  = process.env.PORT || 8080
+// Adding CORS and JSON parsing middleware
+app.use(cors());
+app.use(express.json());
+
+// Setting up the port for the server
+const PORT = process.env.PORT || 8080;
 //........................................................................
 //schema
-const schemaData  = mongoose.Schema({
-    name : String,
-    email : String,
-    mobile : String,
-},{
-    timestamps : true
-})
+// Defining the data structure for our MongoDB collection
+const schemaData = mongoose.Schema(
+  {
+    name: String,
+    email: String,
+    mobile: String,
+  },
+  {
+    timestamps: true,
+  }
+);
 
 //...................................................................
 
-//cretae model
-const userModel  = mongoose.model("user",schemaData)
+// Creating a model based on the defined schema
+const userModel = mongoose.model("user", schemaData);
 
 //.......................................................................
 
 // read data
 // ​ http://localhost:8080/
-app.get("/",async(req,res)=>{
-    const data = await userModel.find({})
-    res.json({success : true , data : data})
-}) 
+app.get("/", async (req, res) => {
+  const data = await userModel.find({});
+  res.json({ success: true, data: data });
+});
 
 //............................................................................
 //create data || save data in mongodb
@@ -40,12 +48,12 @@ app.get("/",async(req,res)=>{
     mobile
 }
 */
-app.post("/create",async(req,res)=>{
-    console.log(req.body)
-    const data = new userModel(req.body)
-    await data.save()
-    res.send({success : true, message : "data save successfully" , data : data})
-})
+app.post("/create", async (req, res) => {
+  console.log(req.body);
+  const data = new userModel(req.body);
+  await data.save();
+  res.send({ success: true, message: "data save successfully", data: data });
+});
 
 //..............................................................................
 //update Data
@@ -57,30 +65,31 @@ app.post("/create",async(req,res)=>{
  *       moible : ""
  * }
  */
-app.put("/update",async(req,res)=>{
-    console.log(req.body)
-    const { _id,...rest} = req.body 
+app.put("/update", async (req, res) => {
+  console.log(req.body);
+  const { _id, ...rest } = req.body;
 
-    console.log(rest)
-    const data = await userModel.updateOne({ _id : _id},rest)
-    res.send({success : true, message : "data update successfully", data : data})
-})
+  console.log(rest);
+  const data = await userModel.updateOne({ _id: _id }, rest);
+  res.send({ success: true, message: "data update successfully", data: data });
+});
 
 //...........................................................................
 //delete api
 // http://localhost:8080/delete/id
-app.delete("/delete/:id",async(req,res)=>{
-    const id = req.params.id
-    console.log(id)
-    const data = await userModel.deleteOne({_id : id})
-    res.send({success : true, message : "data delete successfully", data : data})
-})
+app.delete("/delete/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  const data = await userModel.deleteOne({ _id: id });
+  res.send({ success: true, message: "data delete successfully", data: data });
+});
 
 //..................................................................................
 
-mongoose.connect("mongodb://127.0.0.1:27017/crudoperation")
-.then(()=>{
-    console.log("connect to DB")
-    app.listen(PORT,()=>console.log("server is running"))
-})
-.catch((err)=>console.log(err))
+mongoose
+  .connect("mongodb://127.0.0.1:27017/crudoperation")
+  .then(() => {
+    console.log("connect to DB");
+    app.listen(PORT, () => console.log("server is running"));
+  })
+  .catch((err) => console.log(err));
